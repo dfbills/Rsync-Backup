@@ -10,19 +10,22 @@
 ###
 ### changelog
 #	10.09.13 changed timeout from 90 to 500
+#	09.18.14 Notifications are now displayed in OSX Notification via terminal-notifier, rather than Growl.
+#		https://github.com/alloy/terminal-notifier
 #
+
 # Startup
 
 clear
 
 	# Write log
-	echo "$(date) - Starting iTunes Backup"  >> /Users/dfbills/Applications/itunes_backup.log
+	echo "$(date) - Starting iTunes Backup"  >> /Users/username/Applications/itunes_backup.log
 	
 	# Notify
 	echo "$(date) - Starting iTunes Backup..."
 	
-	# Notify via Growl
-	growlnotify -m "Starting up..." "iTunes Backup"
+	# Notify via OSX Notifications
+	terminal-notifier -title 'Rsync Music Backup' -message 'Starting up...'
 
 # Trap interrupts and exit instead of continuing the loop
 trap "echo Exited!; exit;" SIGINT SIGTERM
@@ -38,17 +41,17 @@ do
  i=$(($i+1))
 if [ $i -eq 1 ]
 then
-	rsync -avz --stats --progress --partial --delete --timeout=500 --exclude-from=/Users/dfbills/.rsync/exclude mini.members.btmm.icloud.com:/Volumes/Drobo/MP3/Archive/ /Volumes/Drobo\ HD/Music\ Archive/
+	rsync -avz --stats --progress --partial --delete --timeout=500 --exclude-from=/Users/username/.rsync/exclude machine_name.members.btmm.icloud.com:/Volumes/Drobo/MP3/Archive/ /Volumes/Drobo\ HD/Music\ Archive/
 else
 	# Write log
-	echo "$(date) - Retry #$i."  >> /Users/dfbills/Applications/itunes_backup.log
+	echo "$(date) - Retry #$i."  >> /Users/username/Applications/itunes_backup.log
 	
 	# Notify
 	echo "$(date) - Retry #$i."
 	
-	# Notify retry via Growl
-	growlnotify -m "Retry #$i." "iTunes Backup"
- rsync -avz --stats --progress --partial --delete --timeout=500 --exclude-from=/Users/dfbills/.rsync/exclude mini.members.btmm.icloud.com:/Volumes/Drobo/MP3/Archive/ /Volumes/Drobo\ HD/Music\ Archive/
+	# Notify retry via OSX Notifications
+	terminal-notifier -title 'Rsync Music Backup' -message 'Retry #$i.'
+ rsync -avz --stats --progress --partial --delete --timeout=500 --exclude-from=/Users/username/.rsync/exclude machine_name.members.btmm.icloud.com:/Volumes/Drobo/MP3/Archive/ /Volumes/Drobo\ HD/Music\ Archive/
 fi
 done
 
@@ -56,12 +59,12 @@ if [ $i -eq $MAX_RETRIES ]
 then
 
 	# Write log
-	echo "$(date) - Hit maximum number of retries, giving up."  >> /Users/dfbills/Applications/itunes_backup.log
+	echo "$(date) - Hit maximum number of retries, giving up."  >> /Users/username/Applications/itunes_backup.log
 
 	# Notify
 	echo "$(date) - Hit maximum number of retries, giving up."
 
-  	# Notify failure via Growl
-	growlnotify -m "Hit maximum number of retries, giving up." "iTunes Backup"
+  	# Notify failure via OSX Notifications
+	terminal-notifier -title 'Rsync Music Backup' -message 'Hit maximum number of retries, giving up.'
 
 fi
